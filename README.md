@@ -25,7 +25,7 @@ Fauxmots is a simple SMTP test server designed for developers to verify outgoing
 
 ## Requirements
 
-- Python 3.7 or higher
+- Python 3.8 or higher
 - Dependencies listed in `requirements.txt`
 
 ## Installation
