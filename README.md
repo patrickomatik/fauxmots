@@ -1,6 +1,6 @@
 # Fauxmots SMTP Test Server
 
-![Python Tests](https://github.com/username/fauxmots/actions/workflows/python-tests.yml/badge.svg)
+![Python Tests](https://github.com/patrickomatik/fauxmots/actions/workflows/python-tests.yml/badge.svg)
 
 <p align="center">
   <img src="docs/images/logo.svg" alt="Fauxmots Logo" width="300">
@@ -32,7 +32,7 @@ Fauxmots is a simple SMTP test server designed for developers to verify outgoing
 
 1. Clone the repository:
    ```
-   git clone https://github.com/username/fauxmots.git
+   git clone https://github.com/patrickomatik/fauxmots.git
    cd fauxmots
    ```
 
