@@ -106,6 +106,9 @@ fauxmots/
 ├── wsgi.py               # WSGI entry point
 └── requirements.txt      # Dependencies
 ```
+### What's In A Name
+
+Literally translated from the French, 'Faux mots' means 'false words', or less literally, as in this case, 'fake emails'.
 
 ## Contributing
 
