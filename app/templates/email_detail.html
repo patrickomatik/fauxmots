@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Fauxmots - View Email{% endblock %}
+
+{% block styles %}
+<style>
+    .email-header {
+        font-weight: bold;
+    }
+    .email-body {
+        padding: 1em;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        white-space: pre-wrap;
+        overflow-x: auto;
+    }
+    .nav-tabs .nav-link {
+        cursor: pointer;
+    }
+    .attachment-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .attachment-list li {
+        padding: 5px 10px;
+        margin-bottom: 5px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        background-color: #f5f5f5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>View Email</h1>
+    <div class="btn-group">
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Back to List</a>
+        <button 
+            class="btn btn-danger"
+            hx-post="{{ url_for('main.delete_email', email_id=email.id) }}"
+            hx-confirm="Are you sure you want to delete this email?"
+            hx-target="body"
+            hx-swap="outerHTML">
+            Delete
+        </button>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        {{ email.subject or '(No Subject)' }}
+    </div>
+    <div class="card-body">
+        <div class="row mb-2">
+            <div class="col-md-2 email-header">From:</div>
+            <div class="col-md-10">{{ email.sender }}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2 email-header">To:</div>
+            <div class="col-md-10">
+                {% for recipient in email.recipients_list %}
+                    <div>{{ recipient }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2 email-header">Date:</div>
+            <div class="col-md-10">{{ email.date_formatted }}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2 email-header">Size:</div>
+            <div class="col-md-10">{{ (email.size / 1024)|round(1) }} KB</div>
+        </div>
+        
+        <!-- Additional Headers -->
+        <div class="mt-4">
+            <button class="btn btn-sm btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#additionalHeaders">
+                Show All Headers
+            </button>
+            <div class="collapse" id="additionalHeaders">
+                <div class="card card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                            {% for key, value in email_content.headers.items() %}
+                            <tr>
+                                <td class="email-header">{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Body -->
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+            {% if email_content.body['text/html'] %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="html-tab" data-bs-toggle="tab" data-bs-target="#html-content" type="button" role="tab" aria-selected="true">HTML</button>
+            </li>
+            {% endif %}
+            
+            {% if email_content.body['text/plain'] %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if not email_content.body['text/html'] %}active{% endif %}" id="plain-tab" data-bs-toggle="tab" data-bs-target="#plain-content" type="button" role="tab" aria-selected="{{ not email_content.body['text/html'] }}">Plain Text</button>
+            </li>
+            {% endif %}
+            
+            {% if email_content.attachments %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="attachments-tab" data-bs-toggle="tab" data-bs-target="#attachments-content" type="button" role="tab" aria-selected="false">
+                    Attachments <span class="badge bg-secondary">{{ email_content.attachments|length }}</span>
+                </button>
+            </li>
+            {% endif %}
+            
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="raw-tab" data-bs-toggle="tab" data-bs-target="#raw-content" type="button" role="tab" aria-selected="false">Raw</button>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body">
+        <div class="tab-content">
+            {% if email_content.body['text/html'] %}
+            <div class="tab-pane fade show active" id="html-content" role="tabpanel">
+                <div class="mb-2">
+                    <button class="btn btn-sm btn-outline-secondary" id="toggle-iframe">Toggle iframe/source</button>
+                </div>
+                <div id="html-iframe-container">
+                    <iframe id="html-iframe" srcdoc="{{ email_content.body['text/html']|e }}" style="width: 100%; height: 600px; border: 1px solid #ddd;"></iframe>
+                </div>
+                <div id="html-source-container" style="display: none;">
+                    <pre class="email-body">{{ email_content.body['text/html']|e }}</pre>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if email_content.body['text/plain'] %}
+            <div class="tab-pane fade {% if not email_content.body['text/html'] %}show active{% endif %}" id="plain-content" role="tabpanel">
+                <pre class="email-body">{{ email_content.body['text/plain']|e }}</pre>
+            </div>
+            {% endif %}
+            
+            {% if email_content.attachments %}
+            <div class="tab-pane fade" id="attachments-content" role="tabpanel">
+                <ul class="attachment-list">
+                    {% for attachment in email_content.attachments %}
+                    <li>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ attachment.filename }}</strong>
+                                <small class="text-muted ms-2">{{ attachment.content_type }}</small>
+                            </div>
+                            <div>
+                                <span class="badge bg-info">{{ (attachment.size / 1024)|round(1) }} KB</span>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <div class="tab-pane fade" id="raw-content" role="tabpanel">
+                <div class="alert alert-info">
+                    Raw email content is available in the file: <code>{{ email.filename }}</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle HTML iframe/source
+    const toggleButton = document.getElementById('toggle-iframe');
+    if (toggleButton) {
+        toggleButton.addEventListener('click', function() {
+            const iframeContainer = document.getElementById('html-iframe-container');
+            const sourceContainer = document.getElementById('html-source-container');
+            
+            if (iframeContainer.style.display === 'none') {
+                iframeContainer.style.display = 'block';
+                sourceContainer.style.display = 'none';
+                toggleButton.textContent = 'Show HTML Source';
+            } else {
+                iframeContainer.style.display = 'none';
+                sourceContainer.style.display = 'block';
+                toggleButton.textContent = 'Show HTML Preview';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

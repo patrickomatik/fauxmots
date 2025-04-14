@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  fauxmots:
+    build: .
+    container_name: fauxmots
+    ports:
+      - "5000:5000"  # Web UI
+      - "1025:1025"  # SMTP server
+    volumes:
+      - ./emails:/app/emails
+      - ./instance:/app/instance
+    environment:
+      - FLASK_APP=app
+      - SMTP_HOST=0.0.0.0
+      - SMTP_PORT=1025
+    command: >
+      bash -c "python -c 'from app.cli import main; main()' --host=0.0.0.0 --port=5000 --smtp-host=0.0.0.0 --smtp-port=1025"
+    restart: unless-stopped

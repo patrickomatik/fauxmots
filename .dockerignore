@@ -1,0 +1,54 @@
+# Version control
+.git
+.gitattributes
+.github
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.tox/
+.coverage
+.coverage.*
+.cache
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+.venv/
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Emails storage (will be mounted as volume)
+emails/*
+!emails/.gitkeep
+
+# Instance (will be mounted as volume)
+instance/*
+
+# Documentation and test files
+docs/
+tests/

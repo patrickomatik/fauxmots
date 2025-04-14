@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Fauxmots - Emails{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Emails</h1>
+    <div class="btn-group">
+        <button 
+            class="btn btn-primary" 
+            hx-get="{{ url_for('main.refresh_emails') }}" 
+            hx-target="#emails-list" 
+            hx-indicator="#refresh-indicator">
+            <span class="spinner-border spinner-border-sm d-none" id="refresh-indicator" role="status"></span>
+            Refresh
+        </button>
+        <button 
+            class="btn btn-danger" 
+            data-bs-toggle="modal" 
+            data-bs-target="#deleteAllModal">
+            Delete All
+        </button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span>SMTP Server: <strong id="smtp-host-port">127.0.0.1:1025</strong></span>
+        <div>
+            <span class="badge bg-light text-dark" id="email-count">{{ emails|length }}</span>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if emails %}
+            <div id="emails-list">
+                {% include '_emails_list.html' %}
+            </div>
+        {% else %}
+            <div id="emails-list" class="text-center py-5">
+                <p class="text-muted">No emails received yet</p>
+                <p>Configure your application to send emails to this SMTP server</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete All Confirmation Modal -->
+<div class="modal fade" id="deleteAllModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete All Emails</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete all emails? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form hx-post="{{ url_for('main.delete_all_emails') }}" hx-target="#emails-list">
+                    <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Delete All</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh emails every 30 seconds
+    setInterval(function() {
+        document.querySelector('[hx-get="{{ url_for('main.refresh_emails') }}"]').click();
+    }, 30000);
+    
+    // Get SMTP server configuration
+    fetch('{{ url_for('main.api_config') }}')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('smtp-host-port').textContent = 
+                data.smtp_host + ':' + data.smtp_port;
+        });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,11 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Ensure shell scripts use LF
+*.sh text eol=lf
+
+# Denote all files that are binary and should not be modified
+*.png binary
+*.jpg binary
+*.gif binary
+*.eml binary
