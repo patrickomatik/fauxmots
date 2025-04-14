@@ -2,6 +2,10 @@
 
 ![Python Tests](https://github.com/username/fauxmots/actions/workflows/python-tests.yml/badge.svg)
 
+<p align="center">
+  <img src="docs/images/logo.svg" alt="Fauxmots Logo" width="300">
+</p>
+
 Fauxmots is a simple SMTP test server designed for developers to verify outgoing emails from other projects. It captures all incoming emails, stores them, and provides a clean web interface to review and manage them.
 
 ## Features
@@ -16,8 +20,8 @@ Fauxmots is a simple SMTP test server designed for developers to verify outgoing
 
 ## Screenshots
 
-![Inbox Screenshot](docs/images/inbox_screenshot.png)
-![Email Detail Screenshot](docs/images/detail_screenshot.png)
+![Inbox Screenshot](docs/images/inbox.png)
+![Email Detail Screenshot](docs/images/detail.png)
 
 ## Requirements
 
